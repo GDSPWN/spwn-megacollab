@@ -1,5 +1,8 @@
-$.print("Hrllo ,rodl!")
+// $.print("Hrllo ,rodl!")
 
+import "bombie/index.spwn"
+import "specky/index.spwn"
+import "ggod/index.spwn"
 
 
 
