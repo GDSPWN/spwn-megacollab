@@ -1,0 +1,91 @@
+extract obj_props
+
+delay = 0.05
+x_offset = 300
+y_offset = -150
+vertices_amt = 8
+size = 1
+
+PLAYER_SPEED = 10.37613454 // 1x
+
+anim_3d = $.readfile("bombie/anim_3d.json", "json")
+
+edge_group = ?g
+edges = [
+    [0, 1], [1, 2], [2, 3], [3, 0],
+    [4, 5], [5, 6], [6, 7], [7, 4],
+    [0, 4], [1, 5], [2, 6], [3, 7]
+]
+
+let vertices = []
+for vertex in 0..vertices_amt {
+    group = ?g
+    vertices.push({
+        GROUP: group,
+        X: x_offset,
+        Y: y_offset,
+    })
+
+    $.add(obj{
+        OBJ_ID: 1764, // circle
+        X: x_offset,
+        Y: y_offset,
+        GROUPS: group,
+    })
+}
+
+for i in 0..anim_3d.length {
+    frame = anim_3d[i]
+
+    for vertex in 0..frame.length {
+        x = x_offset + frame[vertex][0] * size
+        y = y_offset + frame[vertex][1] * size
+
+        if x == vertices[vertex].X ||
+        y == vertices[vertex].Y { continue }
+
+        $.add(obj{
+            OBJ_ID: 901, // move
+            X: 75 + i*PLAYER_SPEED*delay*30,
+            Y: -30 - vertex*15,
+            MOVE_X: x - vertices[vertex].X,
+            MOVE_Y: y - vertices[vertex].Y,
+            DURATION: delay,
+            TARGET: vertices[vertex].GROUP
+        })
+
+        vertices[vertex].X = x
+        vertices[vertex].Y = y
+    }
+
+    for edge in 0..edges.length {
+        vertex1 = vertices[edges[edge][0]]
+        vertex2 = vertices[edges[edge][1]]
+
+        dx = vertex2.X - vertex1.X
+        dy = vertex2.Y - vertex1.Y
+
+        $.add(obj{
+            OBJ_ID: 1756, // line ig? idk
+            X: (vertex1.X + vertex2.X) / 2,
+            Y: (vertex1.Y + vertex2.Y) / 2
+                + i*400,
+            ROTATION: $.atan2(dx, dy) * 180 / PI,
+            SCALING: $.sqrt(dx*dx + dy*dy) / 30,
+            COLOR: 1c,
+            GROUPS: edge_group,
+        })
+    }
+
+    $.add(obj{
+        OBJ_ID: 901, // move
+        X: 75 + i*PLAYER_SPEED*delay*30,
+        Y: -180,
+        MOVE_X: 0,
+        MOVE_Y: -400,
+        DURATION: 0,
+        TARGET: edge_group
+    })
+
+}
+

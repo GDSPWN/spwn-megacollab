@@ -1,1 +1,3 @@
-$.print("skill")
+real = import "3d.spwn"
+
+
